@@ -7,7 +7,7 @@ const app = express();
 // Allowed frontend origins
 const allowedOrigins = [
   "http://localhost:5173", // local frontend
-  "https://career-compass-ai-frontend.onrender.com" // <-- isko apne actual frontend URL se replace karna
+ "https://career-compass-ai-3.onrender.com"
 ];
 
 app.use(express.json());
