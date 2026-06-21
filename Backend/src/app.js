@@ -1,25 +1,56 @@
-const express = require("express")
-const cookieParser = require("cookie-parser")
-const cors = require("cors")
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
-const app = express()
+const app = express();
 
-app.use(express.json())
-app.use(cookieParser())
-app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true
-}))
+// Allowed frontend origins
+const allowedOrigins = [
+  "http://localhost:5173", // local frontend
+  "https://career-compass-ai-frontend.onrender.com" // <-- isko apne actual frontend URL se replace karna
+];
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (Postman / server-to-server)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+// Root route for Render test
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Career Compass AI backend is running 🚀",
+  });
+});
 
 /* require all the routes here */
-const authRouter = require("./routes/auth.routes")
-const interviewRouter = require("./routes/interview.routes")
-
+const authRouter = require("./routes/auth.routes");
+const interviewRouter = require("./routes/interview.routes");
 
 /* using all the routes here */
-app.use("/api/auth", authRouter)
-app.use("/api/interview", interviewRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/interview", interviewRouter);
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
 
-
-module.exports = app
+module.exports = app;
